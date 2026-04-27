@@ -12,11 +12,10 @@ Scaffolded project structure for a FastAPI, PostgreSQL, and Airflow based data p
 1. Clone the repository:
 
 ```bash
-git clone <project_url>
+git clone https://github.com/mehul1992/scope-data-pipeline.git
 cd scope-data-pipeline
 ```
 
-Replace `<project_url>` with your Git remote URL.
 
 2. Start the stack in the background:
 
