@@ -103,12 +103,6 @@ class ExtractOperator:
                 """
                 INSERT INTO upload_audit (filename, file_sha256, file_path, status)
                 VALUES ($1, $2, $3, $4)
-                ON CONFLICT (file_sha256)
-                DO UPDATE SET
-                    status = 'pending',
-                    error_message = NULL,
-                    processed_at = NULL
-                WHERE upload_audit.status = 'failed'
                 RETURNING upload_id
                 """,
                 filename,

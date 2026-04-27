@@ -19,7 +19,7 @@ class UploadAudit(Base, TimestampMixin):
             "status IN ('pending', 'processing', 'completed', 'failed')",
             name="ck_upload_audit_status",
         ),
-        Index("ix_upload_audit_file_sha256", "file_sha256", unique=True),
+        Index("ix_upload_audit_file_sha256", "file_sha256"),
         Index("ix_upload_audit_status", "status"),
         Index("ix_upload_audit_uploaded_at", "uploaded_at"),
     )
