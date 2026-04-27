@@ -117,7 +117,7 @@ class CompanyTransformer:
         try:
             row = await conn.fetchrow(
                 """
-                SELECT dc.entity_name, cv.version_number
+                SELECT dc.entity_name, cv.version_number, dc.company_id
                 FROM dim_company dc
                 INNER JOIN company_versions cv
                     ON dc.company_id = cv.company_id
