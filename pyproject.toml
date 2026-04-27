@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling>=1.24.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "scope-data-pipeline"
+version = "0.1.0"
+description = "Production-ready corporate credit rating data pipeline scaffold."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115.0,<1.0.0",
+  "uvicorn[standard]>=0.30.0,<1.0.0",
+  "alembic>=1.13.0,<2.0.0",
+  "sqlalchemy>=2.0.0,<3.0.0",
+  "psycopg[binary]>=3.1.0,<4.0.0",
+  "pydantic>=2.8.0,<3.0.0",
+  "pydantic-settings>=2.3.0,<3.0.0",
+  "structlog>=25.2.0,<26",
+  "openpyxl==3.1.5",
+  "defusedxml==0.7.1",
+  "python-json-logger>=2.0.0,<3.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]

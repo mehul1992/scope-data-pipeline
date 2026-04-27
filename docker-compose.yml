@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: scope_postgres
+    environment:
+      POSTGRES_DB: scope
+      POSTGRES_USER: scope
+      POSTGRES_PASSWORD: scope
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scope -d scope"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    container_name: scope_api
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./app:/workspace/app
+      - ./data:/workspace/data
+      - ./alembic.ini:/workspace/alembic.ini
+      - ./app/db/migrations:/workspace/app/db/migrations
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  airflow:
+    build:
+      context: .
+      dockerfile: docker/airflow.Dockerfile
+    container_name: scope_airflow
+    environment:
+      PYTHONPATH: /opt/airflow
+      DATA_DIR: /opt/airflow/data
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__API_AUTH__JWT_SECRET: "6374e1a0f2bcf4c896fc594f3b4aae1367e36ce9a421d23c338264a4a2f5a973"
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://scope:scope@postgres:5432/airflow_db
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin
+      _AIRFLOW_WWW_USER_ROLE: Admin
+      _AIRFLOW_WWW_USER_EMAIL: mehul.moleshwari@gmail.com
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    volumes:
+      - airflow_data:/opt/airflow
+      - ./app/airflow/dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./app:/opt/airflow/app
+      - ./.env:/opt/airflow/.env
+      - ./pyproject.toml:/opt/airflow/pyproject.toml
+    # Airflow 3: `airflow dags list` reads from the metadata DB, which is filled by the dag-processor.
+    # API server alone does not parse DAG files into the DB.
+    command:
+      - bash
+      - -lc
+      - |
+        rm -rf /opt/airflow/venv 2>/dev/null || true
+        airflow db migrate
+        airflow dag-processor &
+        airflow scheduler &
+        exec airflow api-server
+
+volumes:
+  postgres_data:
+  airflow_data:
