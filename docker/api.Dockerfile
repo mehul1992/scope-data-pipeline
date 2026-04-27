@@ -7,8 +7,11 @@ ENV PYTHONUNBUFFERED=1
 
 COPY app /workspace/app
 COPY pyproject.toml README.md /workspace/
+COPY docker/entrypoint.sh /workspace/entrypoint.sh
+COPY alembic.ini /workspace/alembic.ini
 RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir .
 
 # RUN alembic upgrade head
+RUN chmod +x /workspace/entrypoint.sh
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["/workspace/entrypoint.sh"]
