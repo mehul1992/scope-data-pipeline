@@ -23,7 +23,6 @@ wheels/
 # Virtual env
 venv/
 .venv/
-env/
 
 # Test / coverage
 .pytest_cache/
@@ -37,11 +36,6 @@ htmlcov/
 .vscode/
 *.swp
 .DS_Store
-
-# Env / secrets
-.env
-.env.*
-!.env.example
 
 # Logs
 *.log
